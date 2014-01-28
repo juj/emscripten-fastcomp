@@ -183,7 +183,7 @@ struct IsLockFreeToConstant {
     default:
       return false;
     }
-#   elif defined(__i386__) || defined(__x86_64__) || defined(__arm__)
+#   elif defined(__i386__) || defined(__x86_64__) || defined(__arm__) || defined(_M_IX86) || defined(_M_X64)
     // Continue.
 #   elif defined(__mips__)
     MaxLockFreeByteSize = 4;

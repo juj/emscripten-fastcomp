@@ -69,6 +69,13 @@
 #include <set>
 #include <map>
 
+/// Error - All bitcode analysis errors go through this function,
+/// making this a good place to breakpoint if debugging.
+static bool Error(const std::string &Err) {
+  llvm::errs() << Err << "\n";
+  return true;
+}
+
 namespace {
 
 using namespace llvm;
@@ -92,13 +99,6 @@ ShowValueDistributions(
     "show-distributions",
     cl::desc("Show collected value distributions in bitcode records."),
     cl::init(false));
-
-/// Error - All bitcode analysis errors go through this function,
-/// making this a good place to breakpoint if debugging.
-static bool Error(const std::string &Err) {
-  errs() << Err << "\n";
-  return true;
-}
 
 // For debugging. Prints out the abbreviation in readable form to errs().
 static void PrintAbbrev(unsigned BlockID, const NaClBitCodeAbbrev *Abbrev) {
