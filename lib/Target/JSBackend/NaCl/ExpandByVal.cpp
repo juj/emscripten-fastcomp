@@ -102,7 +102,7 @@ static bool ExpandCall(DataLayout *DL, InstType *Call) {
   bool Modify = false;
   AttributeList Attrs = Call->getAttributes();
   for (unsigned ArgIdx = 0; ArgIdx < Call->getNumArgOperands(); ++ArgIdx) {
-    unsigned AttrIdx = ArgIdx + 1;
+    unsigned AttrIdx = ArgIdx;
 
     if (Attrs.hasAttribute(AttrIdx, Attribute::StructRet))
       Modify = true;
