@@ -649,6 +649,12 @@ namespace {
           code = code.replace(curr, 2, "\\\\n");
           curr += 3; // skip this one
         }
+        // replace tabs with escaped tabs
+        curr = 0;
+        while ((curr = code.find("\t", curr)) != std::string::npos) {
+          code = code.replace(curr, 1, "\\\\t");
+          curr += 3; // skip this one
+        }
         // replace double quotes with escaped single quotes
         curr = 0;
         while ((curr = code.find('"', curr)) != std::string::npos) {
@@ -3016,11 +3022,6 @@ void JSWriter::generateExpression(const User *I, raw_string_ostream& Code) {
         // implemented, we could remove the emulation, but until then we must emulate manually.
         bool fround = PreciseF32 && !strcmp(HeapName, "HEAPF32");
         Code << Assign << (fround ? "Math_fround(" : "+") << "_emscripten_atomic_" << atomicFunc << "_" << heapNameToAtomicTypeName(HeapName) << "(" << getValueAsStr(P) << ", " << VS << (fround ? "))" : ")"); break;
-
-      // TODO: Remove the following two lines once https://bugzilla.mozilla.org/show_bug.cgi?id=1141986 is implemented!
-      } else if (rmwi->getOperation() == AtomicRMWInst::Xchg && !strcmp(HeapName, "HEAP32")) {
-        Code << Assign << "_emscripten_atomic_exchange_u32(" << getValueAsStr(P) << ", " << VS << ")|0"; break;
-
       } else {
         Code << Assign << "(Atomics_" << atomicFunc << "(" << HeapName << ", " << Index << ", " << VS << ")|0)"; break;
       }
