@@ -613,6 +613,14 @@ DEF_CALL_HANDLER(llvm_lifetime_end_p0i8, {
   return "";
 })
 
+DEF_CALL_HANDLER(llvm_invariant_start, {
+  return "";
+})
+
+DEF_CALL_HANDLER(llvm_invariant_end, {
+  return "";
+})
+
 DEF_CALL_HANDLER(llvm_invariant_start_p0i8, {
   return "";
 })
@@ -1651,6 +1659,8 @@ void setupCallHandlers() {
   SETUP_CALL_HANDLER(llvm_lifetime_end);
   SETUP_CALL_HANDLER(llvm_lifetime_start_p0i8);
   SETUP_CALL_HANDLER(llvm_lifetime_end_p0i8);
+  SETUP_CALL_HANDLER(llvm_invariant_start);
+  SETUP_CALL_HANDLER(llvm_invariant_end);
   SETUP_CALL_HANDLER(llvm_invariant_start_p0i8);
   SETUP_CALL_HANDLER(llvm_invariant_end_p0i8);
   SETUP_CALL_HANDLER(llvm_prefetch);
