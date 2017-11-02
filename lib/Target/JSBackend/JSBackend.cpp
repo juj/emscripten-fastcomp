@@ -4465,7 +4465,7 @@ bool JSTargetMachine::addPassesToEmitFile(
   if (!OnlyWebAssembly) {
     // if only wasm, then we can emit i64s, otherwise they must be lowered
     PM.add(createExpandI64Pass());
-  } else {
+  } else if (!EnablePthreads) {
     // only wasm, and for now no atomics there, so just lower them out
     PM.add(createLowerAtomicPass());
   }
