@@ -1316,7 +1316,7 @@ std::string JSWriter::getLoad(const Instruction *I, const Value *P, Type *T, uns
       const char *HeapName;
       std::string Index = getHeapNameAndIndex(P, &HeapName);
       if (!strcmp(HeapName, "HEAP64")) {
-        text = Assign + "_emscripten_atomic_load_" + heapNameToAtomicTypeName(HeapName) + "(" + getValueAsStr(P) + ")";
+        text = Assign + "i64_atomics_load(" + getValueAsStr(P) + ")";
       } else if (!strcmp(HeapName, "HEAPF32") || !strcmp(HeapName, "HEAPF64")) {
         bool fround = PreciseF32 && !strcmp(HeapName, "HEAPF32");
         // TODO: If https://bugzilla.mozilla.org/show_bug.cgi?id=1131613 and https://bugzilla.mozilla.org/show_bug.cgi?id=1131624 are
@@ -1459,7 +1459,7 @@ std::string JSWriter::getStore(const Instruction *I, const Value *P, Type *T, co
       const char *HeapName;
       std::string Index = getHeapNameAndIndex(P, &HeapName);
       if (!strcmp(HeapName, "HEAP64")) {
-        text = std::string("_emscripten_atomic_store_") + heapNameToAtomicTypeName(HeapName) + "(" + getValueAsStr(P) + ',' + VS + ')';
+        text = std::string("i64_atomics_store(") + getValueAsStr(P) + ',' + VS + ")|0";
       } else if (!strcmp(HeapName, "HEAPF32") || !strcmp(HeapName, "HEAPF64")) {
         // TODO: If https://bugzilla.mozilla.org/show_bug.cgi?id=1131613 and https://bugzilla.mozilla.org/show_bug.cgi?id=1131624 are
         // implemented, we could remove the emulation, but until then we must emulate manually.
@@ -3025,7 +3025,7 @@ void JSWriter::generateExpression(const User *I, raw_string_ostream& Code) {
         case AtomicRMWInst::BAD_BINOP: llvm_unreachable("Bad atomic operation");
       }
       if (!strcmp(HeapName, "HEAP64")) {
-        Code << Assign << "(_emscripten_atomic_" << atomicFunc << "_" << heapNameToAtomicTypeName(HeapName) << "(" << getValueAsStr(P) << ", " << VS << ")|0)"; break;
+        Code << Assign << "(i64_atomics_" << atomicFunc << "(" << getValueAsStr(P) << ", " << VS << ")|0)"; break;
       } else if (!strcmp(HeapName, "HEAPF32") || !strcmp(HeapName, "HEAPF64")) {
         // TODO: If https://bugzilla.mozilla.org/show_bug.cgi?id=1131613 and https://bugzilla.mozilla.org/show_bug.cgi?id=1131624 are
         // implemented, we could remove the emulation, but until then we must emulate manually.
