@@ -1288,7 +1288,7 @@ std::string JSWriter::getLoad(const Instruction *I, const Value *P, Type *T, uns
   std::string Assign = getAssign(I);
   unsigned Bytes = DL->getTypeAllocSize(T);
   bool Aligned = Bytes <= Alignment || Alignment == 0;
-  if (OnlyWebAssembly) {
+  if (OnlyWebAssembly && (!EnablePthreads || !cast<LoadInst>(I)->isVolatile())) {
     if (isAbsolute(P)) {
       // loads from an absolute constants are either intentional segfaults (int x = *((int*)0)), or code problems
       JSWriter::getAssign(I); // ensure the variable is defined, even if it isn't used
@@ -1435,19 +1435,21 @@ std::string JSWriter::getStore(const Instruction *I, const Value *P, Type *T, co
     if (Alignment == 536870912) {
       return "abort() /* segfault */";
     }
-    if (T->isIntegerTy() || T->isPointerTy()) {
-      switch (Bytes) {
-        case 1: return "store1(" + getValueAsStr(P) + "," + VS + ")";
-        case 2: return "store2(" + getValueAsStr(P) + "," + VS + (Aligned ? "" : "," + itostr(Alignment)) + ")";
-        case 4: return "store4(" + getValueAsStr(P) + "," + VS + (Aligned ? "" : "," + itostr(Alignment)) + ")";
-        case 8: return "store8(" + getValueAsStr(P) + "," + VS + (Aligned ? "" : "," + itostr(Alignment)) + ")";
-        default: llvm_unreachable("invalid wasm-only int load size");
-      }
-    } else {
-      switch (Bytes) {
-        case 4: return "storef(" + getValueAsStr(P) + "," + VS + (Aligned ? "" : "," + itostr(Alignment)) + ")";
-        case 8: return "stored(" + getValueAsStr(P) + "," + VS + (Aligned ? "" : "," + itostr(Alignment)) + ")";
-        default: llvm_unreachable("invalid wasm-only float load size");
+    if (!EnablePthreads || !cast<LoadInst>(I)->isVolatile()) {
+      if (T->isIntegerTy() || T->isPointerTy()) {
+        switch (Bytes) {
+          case 1: return "store1(" + getValueAsStr(P) + "," + VS + ")";
+          case 2: return "store2(" + getValueAsStr(P) + "," + VS + (Aligned ? "" : "," + itostr(Alignment)) + ")";
+          case 4: return "store4(" + getValueAsStr(P) + "," + VS + (Aligned ? "" : "," + itostr(Alignment)) + ")";
+          case 8: return "store8(" + getValueAsStr(P) + "," + VS + (Aligned ? "" : "," + itostr(Alignment)) + ")";
+          default: llvm_unreachable("invalid wasm-only int load size");
+        }
+      } else {
+        switch (Bytes) {
+          case 4: return "storef(" + getValueAsStr(P) + "," + VS + (Aligned ? "" : "," + itostr(Alignment)) + ")";
+          case 8: return "stored(" + getValueAsStr(P) + "," + VS + (Aligned ? "" : "," + itostr(Alignment)) + ")";
+          default: llvm_unreachable("invalid wasm-only float load size");
+        }
       }
     }
   }
