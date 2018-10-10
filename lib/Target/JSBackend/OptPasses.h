@@ -17,6 +17,7 @@ namespace llvm {
   extern FunctionPass *createEmscriptenSimplifyAllocasPass();
   extern ModulePass *createEmscriptenRemoveLLVMAssumePass();
   extern FunctionPass *createEmscriptenExpandBigSwitchesPass();
+  extern FunctionPass *createEmitFunctionGraphDataPass(std::string outputJsonFile);
 
 } // End llvm namespace
 

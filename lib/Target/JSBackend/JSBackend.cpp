@@ -192,6 +192,10 @@ OnlyWebAssembly("emscripten-only-wasm",
                 cl::desc("Generate code that will only ever be used as WebAssembly, and is not valid JS or asm.js"),
                 cl::init(false));
 
+static cl::opt<std::string>
+EmitFunctionGraphData("emit-function-graph-data",
+           cl::desc("Generates function debug information and call flow data to the specified JSON file"),
+           cl::init(""));
 
 extern "C" void LLVMInitializeJSBackendTarget() {
   // Register the target.
@@ -4909,6 +4913,9 @@ bool JSTargetMachine::addPassesToEmitFile(PassManagerBase &PM, raw_pwrite_stream
 
   PM.add(createEmscriptenRemoveLLVMAssumePass());
   PM.add(createEmscriptenExpandBigSwitchesPass());
+
+  if (!EmitFunctionGraphData.empty())
+    PM.add(createEmitFunctionGraphDataPass(EmitFunctionGraphData));
 
   PM.add(new JSWriter(Out, OptLevel));
 
