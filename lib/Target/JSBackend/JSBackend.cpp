@@ -861,7 +861,7 @@ namespace {
           // If we reach here, things have already gone bad, and JS engine NaN canonicalization will kill the bits in the float. However can't make
           // this a build error in order to not break people's existing code, so issue a warning instead.
           if (WarnOnNoncanonicalNans) {
-            errs() << "emcc: warning: cannot represent a NaN literal '" << CFP << "' with custom bit pattern in NaN-canonicalizing JS engines (e.g. Firefox and Safari) without erasing bits!\n";
+            errs() << "emcc: warning: cannot represent a NaN literal '0x" << i.toString(16, false) << "' with custom bit pattern in NaN-canonicalizing JS engines (e.g. Firefox and Safari) without erasing bits!\n";
             if (CurrInstruction) {
               errs() << "  in " << *CurrInstruction << " in " << CurrInstruction->getParent()->getParent()->getName() << "() ";
               emitDebugInfo(errs(), CurrInstruction);
